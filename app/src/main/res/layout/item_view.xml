@@ -2,10 +2,8 @@
 <android.support.v4.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <TextView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rv_android"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_gravity="center"
-        android:gravity="center"
-        android:text="微信公众号:Android订阅"/>
+        android:layout_height="match_parent" />
 </android.support.v4.widget.NestedScrollView>

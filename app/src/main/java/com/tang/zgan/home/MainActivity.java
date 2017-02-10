@@ -1,36 +1,44 @@
 package com.tang.zgan.home;
 
+import android.app.ActivityOptions;
 import android.content.Context;
-import android.graphics.BitmapFactory;
+import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.TabLayout;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.Palette;
+import android.support.v7.widget.AppCompatImageView;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.bumptech.glide.Glide;
 import com.tang.zgan.C;
 import com.tang.zgan.R;
+import com.tang.zgan.bean.AndroidArticle;
 import com.tang.zgan.bean.Meizi;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
-import okhttp3.Response;
-import okhttp3.ResponseBody;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -64,28 +72,85 @@ public class MainActivity extends AppCompatActivity {
 
         mViewPager = (ViewPager) findViewById(R.id.viewpager);
         mTabLayout = (TabLayout) findViewById(R.id.tablayout);
-       mIv= (ImageView) findViewById(R.id.iv);
+        mIv= (ImageView) findViewById(R.id.iv);
         mInflater = LayoutInflater.from(this);
         view1 = mInflater.inflate(R.layout.item_view, null);
         view2 = mInflater.inflate(R.layout.item_meizi, null);
+        mViewList.add(view1);
+        mViewList.add(view2);
         /***********************/
-        OkHttpClient.Builder okHttpClient=new OkHttpClient().newBuilder();
-        Retrofit retrofit=new Retrofit.Builder().baseUrl(C.API)
+        final OkHttpClient.Builder okHttpClient=new OkHttpClient().newBuilder();
+       final Retrofit retrofit=new Retrofit.Builder().baseUrl(C.API)
                 .client(okHttpClient.build())
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
         MeiziService meiziService= retrofit.create(MeiziService.class);
-        retrofit2.Call<Meizi>  call=meiziService.getMeizi("10","1");
+        retrofit2.Call<Meizi>  call=meiziService.getMeizi("40","1");
         Request.Builder request=new Request.Builder();
         call.enqueue(new retrofit2.Callback<Meizi>(){
 
             @Override
             public void onResponse(retrofit2.Call<Meizi> call, retrofit2.Response<Meizi> response) {
-                Meizi meizi= response.body();
+                final Meizi meizi= response.body();
                 Log.i("TAG",meizi.isError()+"---------");
+                Glide.with(MainActivity.this).load(meizi.getResults().get(0).getUrl()).into(mIv);
+                //添加到View集合
+
                 RecyclerView rv= (RecyclerView) view2.findViewById(R.id.rv_meizi);
-                MyRecyclerViewAdapter myRecyclerAdpter=new MyRecyclerViewAdapter(MainActivity.this,meizi.getResults());
-                rv.setAdapter(myRecyclerAdpter);
+                MyRecyclerViewAdapter myRecyclerAdapter=new MyRecyclerViewAdapter(MainActivity.this,meizi.getResults());
+                final StaggeredGridLayoutManager manager=new StaggeredGridLayoutManager(2,StaggeredGridLayoutManager.VERTICAL);
+                manager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_NONE);
+                rv.setLayoutManager(manager);
+                rv.setAdapter(myRecyclerAdapter);
+                myRecyclerAdapter.setListener(new MyRecyclerViewAdapter.OnItemListener() {
+                    @Override
+                    public void onItemClick(View view, Object obj) {
+                        Log.i("TAG","<-----------");
+                        MyHolderView myHolderView= (MyHolderView) obj;
+                        Intent intent=new Intent();
+                        intent.setClass(MainActivity.this,MeiziActivity.class);
+                        ActivityCompat.startActivity(MainActivity.this,intent,ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, myHolderView.mIvMeizi, "meizinihao").toBundle());
+
+                    }
+                });
+                rv.addOnScrollListener(new RecyclerView.OnScrollListener() {
+                    @Override
+                    public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                        super.onScrollStateChanged(recyclerView, newState);
+                        manager.invalidateSpanAssignments(); //防止第一行到顶部有空白区域
+                    }
+                });
+
+                //添加标题集合
+                mTitles.add("安卓");
+                mTitles.add("妹子");
+
+                mTabLayout.setTabMode(TabLayout.MODE_FIXED);//设置tab模式，当前为系统默认模式
+                mTabLayout.addTab(mTabLayout.newTab().setText(mTitles.get(0)));//添加tab选项卡
+                mTabLayout.addTab(mTabLayout.newTab().setText(mTitles.get(1)));
+
+                MyPagerAdapter mAdapter = new MyPagerAdapter(mViewList);
+                mViewPager.setAdapter(mAdapter);//给ViewPager设置适配器
+                mTabLayout.setupWithViewPager(mViewPager);//将TabLayout和ViewPager关联起来。
+                //mTabLayout.setTabsFromPagerAdapter(mAdapter);//给Tabs设置适配器
+                mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+                    @Override
+                    public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+                    }
+
+                    @Override
+                    public void onPageSelected(int position) {
+                        Random random=new Random();
+                        int randomNum=random.nextInt(meizi.getResults().size());
+                        Glide.with(MainActivity.this).load(meizi.getResults().get(randomNum).getUrl()).into(mIv);
+                    }
+
+                    @Override
+                    public void onPageScrollStateChanged(int state) {
+
+                    }
+                });
             }
 
             @Override
@@ -93,83 +158,27 @@ public class MainActivity extends AppCompatActivity {
 
             }
         });
+
                 /***********************/
-
-        //添加到View集合
-        mViewList.add(view1);
-        mViewList.add(view2);
-
-        //添加标题集合
-        mTitles.add("妹子");
-        mTitles.add("安卓");
-
-        mTabLayout.setTabMode(TabLayout.MODE_FIXED);//设置tab模式，当前为系统默认模式
-        mTabLayout.addTab(mTabLayout.newTab().setText(mTitles.get(0)));//添加tab选项卡
-        mTabLayout.addTab(mTabLayout.newTab().setText(mTitles.get(1)));
-
-        MyPagerAdapter mAdapter = new MyPagerAdapter(mViewList);
-        mViewPager.setAdapter(mAdapter);//给ViewPager设置适配器
-        mTabLayout.setupWithViewPager(mViewPager);//将TabLayout和ViewPager关联起来。
-        //mTabLayout.setTabsFromPagerAdapter(mAdapter);//给Tabs设置适配器
-        mViewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+        AndroidService androidService= retrofit.create(AndroidService.class);
+        Call<AndroidArticle> androidArticleCall= androidService.getAndroid("30","1");
+        androidArticleCall.enqueue(new Callback<AndroidArticle>() {
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+            public void onResponse(Call<AndroidArticle> call, Response<AndroidArticle> response) {
+                RecyclerView rv= (RecyclerView) view1.findViewById(R.id.rv_android);
+                MyAndroidRecyclerViewAdapter myRecyclerAdapter=new MyAndroidRecyclerViewAdapter(MainActivity.this,response.body().getResults());
+                rv.setLayoutManager(new LinearLayoutManager(MainActivity.this));
+                rv.setAdapter(myRecyclerAdapter);
+                rv.addItemDecoration(new DividerItemDecoration(MainActivity.this,DividerItemDecoration.VERTICAL));
             }
 
             @Override
-            public void onPageSelected(int position) {
-                    if(position==0){
-                        mIv.setImageResource(R.mipmap.bg_splash);
-                    }else{
-                        mIv.setImageResource(R.mipmap.bg_title);
-                    }
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
+            public void onFailure(Call<AndroidArticle> call, Throwable t) {
 
             }
         });
-        Palette.Builder builder = Palette.from(BitmapFactory.decodeResource(getResources(), R.mipmap.bg_title));
-        builder.generate(new Palette.PaletteAsyncListener() {
-            @Override
-            public void onGenerated(Palette palette) {
-                Palette.Swatch vibrant = palette.getVibrantSwatch();
-                if (vibrant != null) {
-
-                }
-
-                Palette.Swatch vibrantlight = palette.getLightVibrantSwatch();
-                if (vibrantlight != null) {
-                    //getWindow().setStatusBarColor(vibrantlight.getBodyTextColor());
-                }
-
-                Palette.Swatch vibrantdark = palette.getDarkVibrantSwatch();
-                if (vibrantdark != null) {
-
-                }
 
 
-                Palette.Swatch muted = palette.getMutedSwatch();
-                if (muted != null) {
-
-                }
-
-
-                Palette.Swatch mutedDark = palette.getDarkMutedSwatch();
-                if (mutedDark != null) {
-
-                }
-
-
-                Palette.Swatch mutedLight = palette.getLightMutedSwatch();
-                if (mutedLight != null) {
-
-                }
-
-            }
-        });
     }
 
 
@@ -208,33 +217,111 @@ public class MainActivity extends AppCompatActivity {
         }
 
     }
-    class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyHolderView>{
+    static class MyRecyclerViewAdapter extends RecyclerView.Adapter<MyHolderView> implements View.OnClickListener {
         private Context context;
         private List<Meizi.ResultsBean> results;
+        private OnItemListener listener;
         public MyRecyclerViewAdapter(Context context, List<Meizi.ResultsBean> results){
-
+            this.context=context;
+            this.results=results;
         }
         @Override
         public MyHolderView onCreateViewHolder(ViewGroup parent, int viewType) {
-            return null;
+           View view= View.inflate(context,R.layout.item_card,null);
+            MyHolderView holderView=new MyHolderView(view);
+            view.setOnClickListener(this);
+            return holderView;
         }
 
         @Override
         public int getItemCount() {
-            return 0;
+            return results.size();
         }
 
         @Override
         public void onBindViewHolder(MyHolderView holder, int position) {
+            Log.i("TAG",position+results.get(position).getUrl());
+            holder.itemView.setTag(holder);
+            Glide.with(context).load(results.get(position).getUrl()).into(holder.mIvMeizi);
+        }
 
+
+        @Override
+        public void onClick(View v) {
+            if(listener!=null){
+                Log.i("TAG","-------->");
+                listener.onItemClick(v,v.getTag());
+            }
+        }
+        interface  OnItemListener{
+            void onItemClick(View view,Object obj);
+        }
+
+
+        public void setListener(OnItemListener listener) {
+            this.listener = listener;
+        }
+    }
+    static class MyHolderView extends RecyclerView.ViewHolder {
+        AppCompatImageView mIvMeizi;
+        public MyHolderView(View itemView) {
+            super(itemView);
+            mIvMeizi= (AppCompatImageView) itemView.findViewById(R.id.iv_meizi);
+        }
+    }
+
+
+
+
+    class MyAndroidRecyclerViewAdapter extends RecyclerView.Adapter<MyAandroidHolderView>{
+        private Context context;
+        private List<AndroidArticle.ResultsBean> results;
+        public MyAndroidRecyclerViewAdapter(Context context, List<AndroidArticle.ResultsBean> results){
+            this.context=context;
+            this.results=results;
+        }
+        @Override
+        public MyAandroidHolderView onCreateViewHolder(ViewGroup parent, int viewType) {
+            View view= View.inflate(context,R.layout.item_android,null);
+            MyAandroidHolderView holderView=new MyAandroidHolderView(view);
+            return holderView;
+        }
+
+        @Override
+        public int getItemCount() {
+            return results.size();
+        }
+
+        @Override
+        public void onBindViewHolder(MyAandroidHolderView holder, int position) {
+            String desc=results.get(position).getDesc();
+            String name=results.get(position).getWho();
+            List<String> list=results.get(position).getImages();
+            if(desc!=null){
+                holder.mTvDesc.setText(desc);
+            }
+            if(name!=null)
+            {
+                holder.mTvName.setText(name);
+            }
+            if(list!=null&&list.size()>0)
+            {
+                Glide.with(MainActivity.this).load(list.get(0)+"?imageView2/0/w/200")
+                        .into(holder.mIv);
+            }
         }
 
 
     }
-    class MyHolderView extends RecyclerView.ViewHolder{
-
-        public MyHolderView(View itemView) {
+    class MyAandroidHolderView extends RecyclerView.ViewHolder{
+        TextView mTvDesc;
+        TextView mTvName;
+        ImageView mIv;
+        public MyAandroidHolderView(View itemView) {
             super(itemView);
+            mTvDesc= (TextView) itemView.findViewById(R.id.tv_desc);
+            mTvName= (TextView) itemView.findViewById(R.id.tv_name);
+            mIv= (ImageView) itemView.findViewById(R.id.iv);
         }
     }
 
