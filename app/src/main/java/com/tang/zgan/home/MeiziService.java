@@ -6,6 +6,8 @@ import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import rx.Observable;
+import rx.Subscription;
 
 /**
  * Created by tangyc on 2017/2/9.
@@ -13,5 +15,5 @@ import retrofit2.http.Path;
 
 public interface MeiziService {
     @GET("福利/{date}/{num}")
-    public Call<Meizi> getMeizi(@Path("date") String date, @Path("num") String num);
+    public Observable<Meizi> getMeizi(@Path("date") String date, @Path("num") String num);
 }

@@ -21,8 +21,9 @@
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme.NoActionBar"
           />
-        <activity android:name=".home.MeiziActivity"
+        <activity android:name=".home.WebViewActivity"
             android:screenOrientation="portrait"
+            android:theme="@style/AppTheme"
             />
     </application>
 
