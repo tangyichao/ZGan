@@ -1,6 +1,5 @@
-package com.tang.zgan;
+package com.tang.zgan.splash;
 
-import android.app.ActivityOptions;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
@@ -14,7 +13,8 @@ import android.view.View;
 import android.widget.LinearLayout;
 
 import com.airbnb.lottie.LottieAnimationView;
-import com.tang.zgan.home.MainActivity;
+import com.tang.zgan.R;
+import com.tang.zgan.home.activity.MainActivity;
 
 import butterknife.ButterKnife;
 

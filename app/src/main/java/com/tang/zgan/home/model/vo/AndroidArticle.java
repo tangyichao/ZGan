@@ -1,4 +1,4 @@
-package com.tang.zgan.bean;
+package com.tang.zgan.home.model.vo;
 
 import java.util.List;
 

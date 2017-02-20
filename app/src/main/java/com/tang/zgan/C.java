@@ -5,5 +5,13 @@ package com.tang.zgan;
  */
 
 public class C {
-    public static String API="http://gank.io/api/data/";
+    /**
+     * api
+     */
+    public final static String API="http://gank.io/api/data/";
+    /**
+     * time
+     */
+    public final static int TIME_OUT= 5;
+
 }
