@@ -14,7 +14,7 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 
 public class HttpMethods {
-    private static HttpMethods http=null;
+    private  static HttpMethods http=null;
     private Retrofit retrofit=null;
     private HttpMethods(){
         OkHttpClient.Builder builder=new OkHttpClient.Builder();

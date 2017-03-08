@@ -7,8 +7,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.resource.bitmap.BitmapTransformation;
 import com.tang.zgan.R;
 import com.tang.zgan.home.model.vo.Meizi;
+import com.tang.zgan.view.LabelView;
 
 import java.util.List;
 
@@ -40,7 +43,12 @@ public class MeiziRecyclerViewAdapter extends RecyclerView.Adapter<MeiziRecycler
         @Override
         public void onBindViewHolder(MeiziHolderView holder, int position) {
             holder.itemView.setTag(holder);
-             Glide.with(context).load(results.get(position).getUrl()).into(holder.mIvMeizi);
+             Glide.with(context).load(results.get(position).getUrl())
+                    // .diskCacheStrategy(DiskCacheStrategy.ALL)
+                     .into(holder.mIvMeizi);
+            String desc=results.get(position).getDesc();
+            holder.mLabelView.setText(desc);
+
         }
 
 
@@ -59,9 +67,11 @@ public class MeiziRecyclerViewAdapter extends RecyclerView.Adapter<MeiziRecycler
 
     class MeiziHolderView extends RecyclerView.ViewHolder {
         AppCompatImageView mIvMeizi;
+        LabelView mLabelView;
         public MeiziHolderView(View itemView) {
             super(itemView);
             mIvMeizi= (AppCompatImageView) itemView.findViewById(R.id.iv_meizi);
+            mLabelView= (LabelView) itemView.findViewById(R.id.labelView);
         }
     }
 
