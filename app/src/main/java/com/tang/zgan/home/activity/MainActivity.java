@@ -110,6 +110,7 @@ public class MainActivity extends AppCompatActivity implements MeiziView ,Androi
 
         //添加标题集合
         mTitles.add("安卓");
+        mTitles.add("IOS");
         mTitles.add("妹子");
 
         mTabLayout.setTabMode(TabLayout.MODE_FIXED);//设置tab模式，当前为系统默认模式
@@ -133,7 +134,9 @@ public class MainActivity extends AppCompatActivity implements MeiziView ,Androi
         meiZiPresenter=new MeiZiPresenterImpl(this);
         meiZiPresenter.getMeizi(30,1);
         androidPresenter=new AndroidPresenterImpl(this);
-        androidPresenter.getAndroid(30,1);
+        androidPresenter.getAndroid("Android",30,1);
+
+        androidPresenter.getAndroid("iOS",30,1);
 
     }
     @Override

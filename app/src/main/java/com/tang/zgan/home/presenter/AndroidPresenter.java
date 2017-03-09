@@ -5,5 +5,5 @@ package com.tang.zgan.home.presenter;
  */
 
 public interface AndroidPresenter {
-    void getAndroid(int count, int number);
+    void getAndroid(String course,int count, int number);
 }

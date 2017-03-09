@@ -24,11 +24,11 @@ public class MeiziModelImpl implements MeiziModel {
         MeiziService service= retrofit.create(MeiziService.class);
         Observable<Meizi> observable= service.getMeizi(String.valueOf(count),String.valueOf(number));
         observable.subscribeOn(Schedulers.io())
+                .unsubscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<Meizi>() {
                     @Override
                     public void onCompleted() {
-
                     }
 
                     @Override

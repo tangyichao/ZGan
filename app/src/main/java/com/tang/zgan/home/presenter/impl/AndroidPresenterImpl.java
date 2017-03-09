@@ -19,9 +19,9 @@ public class AndroidPresenterImpl implements AndroidPresenter,OnAndroidListener 
         androidModel=new AndroidModelImpl();
     }
     @Override
-    public void getAndroid(int count,int number) {
+    public void getAndroid(String course,int count,int number) {
         androidView.showLoading();
-        androidModel.loadingAndroid(count,number,this);
+        androidModel.loadingAndroid(course,count,number,this);
     }
 
     @Override

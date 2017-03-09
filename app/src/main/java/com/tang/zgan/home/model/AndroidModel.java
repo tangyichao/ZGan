@@ -8,5 +8,5 @@ import com.tang.zgan.home.presenter.OnAndroidListener;
  */
 
 public interface AndroidModel {
-    void loadingAndroid(int count, int number, OnAndroidListener listener);
+    void loadingAndroid(String course,int count, int number, OnAndroidListener listener);
 }

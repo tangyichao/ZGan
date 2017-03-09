@@ -12,6 +12,6 @@ import rx.Observable;
  */
 
 public interface AndroidService {
-    @GET("Android/{date}/{num}")
-    public Observable<AndroidArticle> getAndroid(@Path("date") String date, @Path("num") String num);
+    @GET("{course}/{date}/{num}")
+    public Observable<AndroidArticle> getAndroid(@Path("course") String course,@Path("date") String date, @Path("num") String num);
 }

@@ -23,10 +23,10 @@ import rx.schedulers.Schedulers;
 public class AndroidModelImpl implements AndroidModel {
 
     @Override
-    public void loadingAndroid(int count, int number, final OnAndroidListener listener) {
+    public void loadingAndroid(String course,int count, int number, final OnAndroidListener listener) {
         Retrofit retrofit= HttpMethods.getHttpMethods().getRetrofit();
         AndroidService service= retrofit.create(AndroidService.class);
-        Observable<AndroidArticle> observable= service.getAndroid(String.valueOf(count),String.valueOf(number));
+        Observable<AndroidArticle> observable= service.getAndroid(course,String.valueOf(count),String.valueOf(number));
         observable.subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<AndroidArticle>() {
